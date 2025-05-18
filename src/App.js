@@ -32,104 +32,49 @@ function App() {
     setUserInfo(null);
   };
 
-  if (!isAuthenticated) {
-    return <Login onLogin={handleLogin} />;
-  }
-
   return (
     <Router>
-      <Box sx={{ display: 'flex' }}>
-        <Navbar userInfo={userInfo} onLogout={handleLogout} />
-        <Sidebar department={userInfo.department} />
-        <Box
-          component="main"
-          sx={{
-            flexGrow: 1,
-            height: '100vh',
-            overflow: 'auto',
-            pt: 8,
-            px: 3
-          }}
-        >
-          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring']}>
-                    <Home />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/production"
-                element={
-                  <ProtectedRoute department={userInfo.department} allowedDepartments={['production']}>
-                    <Production userInfo={userInfo} />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/quality"
-                element={
-                  <ProtectedRoute department={userInfo.department} allowedDepartments={['quality']}>
-                    <Quality userInfo={userInfo} />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/maintenance"
-                element={
-                  <ProtectedRoute department={userInfo.department} allowedDepartments={['maintenance']}>
-                    <Maintenance userInfo={userInfo} />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/packaging"
-                element={
-                  <ProtectedRoute department={userInfo.department} allowedDepartments={['packaging']}>
-                    <Packaging userInfo={userInfo} />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/coloring"
-                element={
-                  <ProtectedRoute department={userInfo.department} allowedDepartments={['coloring']}>
-                    <Coloring userInfo={userInfo} />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/reports"
-                element={
-                  <ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring']}>
-                    <Reports />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/reports/upload"
-                element={
-                  <ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring']}>
-                    <ReportUpload />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/reports/download"
-                element={
-                  <ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring']}>
-                    <ReportDownload />
-                  </ProtectedRoute>
-                }
-              />
-              <Route path="/" element={<Navigate to={`/${userInfo.department}`} replace />} />
-            </Routes>
-          </Container>
-        </Box>
-      </Box>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login onLogin={handleLogin} />} />
+        {isAuthenticated && userInfo && (
+          <Route
+            path="*"
+            element={
+              <Box sx={{ display: 'flex' }}>
+                <Navbar userInfo={userInfo} onLogout={handleLogout} />
+                <Sidebar department={userInfo.department} />
+                <Box
+                  component="main"
+                  sx={{
+                    flexGrow: 1,
+                    height: '100vh',
+                    overflow: 'auto',
+                    pt: 8,
+                    px: 3
+                  }}
+                >
+                  <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+                    <Routes>
+                      <Route path="/production" element={<ProtectedRoute department={userInfo.department} allowedDepartments={['production']}><Production userInfo={userInfo} /></ProtectedRoute>} />
+                      <Route path="/quality" element={<ProtectedRoute department={userInfo.department} allowedDepartments={['quality']}><Quality userInfo={userInfo} /></ProtectedRoute>} />
+                      <Route path="/maintenance" element={<ProtectedRoute department={userInfo.department} allowedDepartments={['maintenance']}><Maintenance userInfo={userInfo} /></ProtectedRoute>} />
+                      <Route path="/packaging" element={<ProtectedRoute department={userInfo.department} allowedDepartments={['packaging']}><Packaging userInfo={userInfo} /></ProtectedRoute>} />
+                      <Route path="/coloring" element={<ProtectedRoute department={userInfo.department} allowedDepartments={['coloring']}><Coloring userInfo={userInfo} /></ProtectedRoute>} />
+                      <Route path="/reports" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring']}><Reports /></ProtectedRoute>} />
+                      <Route path="/reports/upload" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring']}><ReportUpload /></ProtectedRoute>} />
+                      <Route path="/reports/download" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring']}><ReportDownload /></ProtectedRoute>} />
+                      <Route path="*" element={<Navigate to={`/${userInfo.department}`} replace />} />
+                    </Routes>
+                  </Container>
+                </Box>
+              </Box>
+            }
+          />
+        )}
+        {/* Redirect any unknown route to home */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </Router>
   );
 }

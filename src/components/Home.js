@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -19,6 +20,7 @@ import {
 
 function Home() {
   const theme = useTheme();
+  const navigate = useNavigate();
 
   const features = [
     {
@@ -72,6 +74,7 @@ function Home() {
                 color="secondary"
                 size="large"
                 sx={{ mt: 2 }}
+                onClick={() => navigate('/login')}
               >
                 Get Started
               </Button>
