@@ -1,144 +1,135 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
-import { AppBar, Toolbar, Typography, Button, Container } from '@mui/material';
-import Production from './components/Production';
-import QualityControl from './components/QualityControl';
-import Maintenance from './components/Maintenance';
+import React, { useState } from 'react';
+import { Routes, Route, Navigate, HashRouter as Router } from 'react-router-dom';
+import { Box, Container } from '@mui/material';
+import Navbar from './components/layout/Navbar';
+import Sidebar from './components/layout/Sidebar';
+import Login from './components/auth/Login';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import Home from './components/Home';
+import Production from './components/departments/Production';
+import Quality from './components/departments/Quality';
+import Maintenance from './components/departments/Maintenance';
+import Packaging from './components/departments/Packaging';
+import Coloring from './components/departments/Coloring';
 import Reports from './components/Reports';
-import Login from './components/Login';
-import ProtectedRoute from './components/ProtectedRoute';
-import Unauthorized from './components/Unauthorized';
-import DepartmentDashboard from './components/DepartmentDashboard';
-import PackagingDepartment from './components/PackagingDepartment';
-import ColoringDepartment from './components/ColoringDepartment';
-import ScrapManagement from './components/ScrapManagement';
-import './App.css';
+import ReportUpload from './components/reports/ReportUpload';
+import ReportDownload from './components/reports/ReportDownload';
 
 function App() {
-  const handleLogout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userDepartment');
-    window.location.href = '/login';
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
+
+  const handleLogin = (data) => {
+    setUserInfo({
+      department: data.department,
+      user: data.user
+    });
+    setIsAuthenticated(true);
   };
 
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  const userDepartment = localStorage.getItem('userDepartment');
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setUserInfo(null);
+  };
 
-  const departments = [
-    { id: 'production', name: 'Production Department' },
-    { id: 'quality', name: 'Quality Control Department' },
-    { id: 'maintenance', name: 'Maintenance Department' },
-    { id: 'packaging', name: 'Packaging Department' },
-    { id: 'coloring', name: 'Coloring Department' }
-  ];
+  if (!isAuthenticated) {
+    return <Login onLogin={handleLogin} />;
+  }
 
   return (
     <Router>
-      <div className="App">
-        {isAuthenticated && (
-          <AppBar position="static">
-            <Toolbar>
-              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-                Hindalco Steel Plant MIS
-              </Typography>
-              <Typography variant="subtitle1" sx={{ mr: 2 }}>
-                {userDepartment.charAt(0).toUpperCase() + userDepartment.slice(1)} Department
-              </Typography>
-              <Button color="inherit" onClick={handleLogout}>
-                Logout
-              </Button>
-            </Toolbar>
-          </AppBar>
-        )}
-
-        <Container>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/unauthorized" element={<Unauthorized />} />
-            
-            <Route
-              path="/"
-              element={
-                <ProtectedRoute>
-                  <Navigate to={`/department/${userDepartment}`} replace />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/department/:department"
-              element={
-                <ProtectedRoute>
-                  <DepartmentDashboard />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/department/production"
-              element={
-                <ProtectedRoute allowedDepartments={['production', 'admin']}>
-                  <Production />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/department/quality"
-              element={
-                <ProtectedRoute allowedDepartments={['quality', 'admin']}>
-                  <QualityControl />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/department/maintenance"
-              element={
-                <ProtectedRoute allowedDepartments={['maintenance', 'admin']}>
-                  <Maintenance />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/reports"
-              element={
-                <ProtectedRoute allowedDepartments={['admin']}>
-                  <Reports />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/department/packaging"
-              element={
-                <ProtectedRoute allowedDepartments={['packaging']}>
-                  <PackagingDepartment />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/department/coloring"
-              element={
-                <ProtectedRoute allowedDepartments={['coloring']}>
-                  <ColoringDepartment />
-                </ProtectedRoute>
-              }
-            />
-
-            <Route
-              path="/scrap-management"
-              element={
-                <ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring']}>
-                  <ScrapManagement />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </Container>
-      </div>
+      <Box sx={{ display: 'flex' }}>
+        <Navbar userInfo={userInfo} onLogout={handleLogout} />
+        <Sidebar department={userInfo.department} />
+        <Box
+          component="main"
+          sx={{
+            flexGrow: 1,
+            height: '100vh',
+            overflow: 'auto',
+            pt: 8,
+            px: 3
+          }}
+        >
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring']}>
+                    <Home />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/production"
+                element={
+                  <ProtectedRoute department={userInfo.department} allowedDepartments={['production']}>
+                    <Production userInfo={userInfo} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/quality"
+                element={
+                  <ProtectedRoute department={userInfo.department} allowedDepartments={['quality']}>
+                    <Quality userInfo={userInfo} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/maintenance"
+                element={
+                  <ProtectedRoute department={userInfo.department} allowedDepartments={['maintenance']}>
+                    <Maintenance userInfo={userInfo} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/packaging"
+                element={
+                  <ProtectedRoute department={userInfo.department} allowedDepartments={['packaging']}>
+                    <Packaging userInfo={userInfo} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/coloring"
+                element={
+                  <ProtectedRoute department={userInfo.department} allowedDepartments={['coloring']}>
+                    <Coloring userInfo={userInfo} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reports"
+                element={
+                  <ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring']}>
+                    <Reports />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reports/upload"
+                element={
+                  <ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring']}>
+                    <ReportUpload />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/reports/download"
+                element={
+                  <ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring']}>
+                    <ReportDownload />
+                  </ProtectedRoute>
+                }
+              />
+              <Route path="/" element={<Navigate to={`/${userInfo.department}`} replace />} />
+            </Routes>
+          </Container>
+        </Box>
+      </Box>
     </Router>
   );
 }

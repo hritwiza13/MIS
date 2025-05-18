@@ -402,9 +402,9 @@ function DepartmentDashboard() {
         { title: 'Compliance Score', value: '99%', trend: 'stable' }
       ],
       recentActivities: [
-        { time: '09:00 AM', activity: 'Daily quality audit completed' },
-        { time: '01:00 PM', activity: 'New testing protocol implemented' },
-        { time: '03:30 PM', activity: 'Quality report generated' }
+        { time: '09:00 AM', activity: 'Daily quality audit completed', type: 'quality' },
+        { time: '01:00 PM', activity: 'New testing protocol implemented', type: 'quality' },
+        { time: '03:30 PM', activity: 'Quality report generated', type: 'quality' }
       ],
       alerts: [
         { severity: 'error', message: 'High defect rate in batch #1234' },
@@ -420,9 +420,9 @@ function DepartmentDashboard() {
         { title: 'Response Time', value: '15 min', trend: '-5 min' }
       ],
       recentActivities: [
-        { time: '08:30 AM', activity: 'Daily equipment inspection' },
-        { time: '12:00 PM', activity: 'Motor replacement completed' },
-        { time: '04:00 PM', activity: 'Maintenance schedule updated' }
+        { time: '08:30 AM', activity: 'Daily equipment inspection', type: 'maintenance' },
+        { time: '12:00 PM', activity: 'Motor replacement completed', type: 'maintenance' },
+        { time: '04:00 PM', activity: 'Maintenance schedule updated', type: 'maintenance' }
       ],
       alerts: [
         { severity: 'warning', message: 'Generator maintenance due' },
@@ -438,9 +438,9 @@ function DepartmentDashboard() {
         { title: 'Turnover Rate', value: '4.2', trend: '+0.3' }
       ],
       recentActivities: [
-        { time: '09:30 AM', activity: 'Stock count completed' },
-        { time: '01:30 PM', activity: 'New shipment received' },
-        { time: '03:00 PM', activity: 'Inventory report generated' }
+        { time: '09:30 AM', activity: 'Stock count completed', type: 'production' },
+        { time: '01:30 PM', activity: 'New shipment received', type: 'production' },
+        { time: '03:00 PM', activity: 'Inventory report generated', type: 'production' }
       ],
       alerts: [
         { severity: 'warning', message: 'Low stock alert: Raw material X' },
@@ -456,9 +456,9 @@ function DepartmentDashboard() {
         { title: 'Open Positions', value: '3', trend: '-2' }
       ],
       recentActivities: [
-        { time: '09:00 AM', activity: 'New employee orientation' },
-        { time: '11:00 AM', activity: 'Performance reviews completed' },
-        { time: '02:00 PM', activity: 'Training session conducted' }
+        { time: '09:00 AM', activity: 'New employee orientation', type: 'production' },
+        { time: '11:00 AM', activity: 'Performance reviews completed', type: 'production' },
+        { time: '02:00 PM', activity: 'Training session conducted', type: 'production' }
       ],
       alerts: [
         { severity: 'info', message: 'New training program available' },
