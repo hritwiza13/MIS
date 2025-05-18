@@ -1,285 +1,470 @@
 import React, { useState } from 'react';
-import * as XLSX from 'xlsx';
-import { Button, Grid, Paper, Typography, ButtonGroup } from '@mui/material';
-import DownloadIcon from '@mui/icons-material/Download';
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import {
+  Box,
+  Paper,
+  Typography,
+  Grid,
+  TextField,
+  MenuItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  IconButton,
+  Chip,
+  Button,
+  Alert,
+  Snackbar,
+  FormControl,
+  InputLabel,
+  Select,
+  OutlinedInput,
+  Checkbox,
+  ListItemText
+} from '@mui/material';
+import {
+  Download as DownloadIcon,
+  Search as SearchIcon,
+  Visibility as VisibilityIcon,
+  Edit as EditIcon,
+  FilterList as FilterListIcon,
+  Clear as ClearIcon
+} from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
+import ReportPreview from './reports/ReportPreview';
+import ReportEdit from './reports/ReportEdit';
+
+const reportTypes = [
+  'Production Report',
+  'Quality Report',
+  'Maintenance Report',
+  'Inventory Report',
+  'Scrap Report',
+  'Efficiency Report'
+];
+
+const departments = [
+  'Production',
+  'Quality Control',
+  'Maintenance',
+  'Packaging',
+  'Coloring'
+];
+
+// Mock data for demonstration
+const mockReports = [
+  {
+    id: 1,
+    name: 'Production Report - January 2024',
+    type: 'Production Report',
+    department: 'Production',
+    date: '2024-01-15',
+    size: '2.5 MB',
+    format: 'PDF',
+    status: 'Approved',
+    file: new Blob(['Mock PDF content'], { type: 'application/pdf' })
+  },
+  {
+    id: 2,
+    name: 'Quality Control Report - Q1 2024',
+    type: 'Quality Report',
+    department: 'Quality Control',
+    date: '2024-01-20',
+    size: '1.8 MB',
+    format: 'XLSX',
+    status: 'Pending',
+    file: new Blob(['Mock Excel content'], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+  },
+  {
+    id: 3,
+    name: 'Maintenance Schedule 2024',
+    type: 'Maintenance Report',
+    department: 'Maintenance',
+    date: '2024-01-25',
+    size: '3.2 MB',
+    format: 'PDF',
+    status: 'Draft',
+    file: new Blob(['Mock PDF content'], { type: 'application/pdf' })
+  }
+];
 
 function Reports() {
-  const [dateRange, setDateRange] = useState({
-    startDate: '',
-    endDate: ''
-  });
+  const navigate = useNavigate();
+  const [selectedType, setSelectedType] = useState('');
+  const [selectedDepartment, setSelectedDepartment] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [error, setError] = useState('');
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
+  const [dateRange, setDateRange] = useState({ start: '', end: '' });
+  const [selectedStatuses, setSelectedStatuses] = useState([]);
+  const [showFilters, setShowFilters] = useState(false);
 
-  const handleDateChange = (e) => {
-    setDateRange({
-      ...dateRange,
-      [e.target.name]: e.target.value
+  const handleView = (report) => {
+    setSelectedReport(report);
+    setPreviewOpen(true);
+  };
+
+  const handleDownload = (report) => {
+    try {
+      // Create a download link
+      const url = URL.createObjectURL(report.file);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = report.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+
+      setSnackbar({
+        open: true,
+        message: 'Report downloaded successfully',
+        severity: 'success'
+      });
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: 'Failed to download report',
+        severity: 'error'
+      });
+    }
+  };
+
+  const handleEdit = (report) => {
+    setSelectedReport(report);
+    setEditOpen(true);
+  };
+
+  const handleSaveEdit = (updatedReport) => {
+    // In a real application, this would update the report in the backend
+    const updatedReports = mockReports.map(report => 
+      report.id === updatedReport.id ? updatedReport : report
+    );
+    
+    if (updatedReport.deleted) {
+      // Remove the deleted report
+      const index = updatedReports.findIndex(r => r.id === updatedReport.id);
+      updatedReports.splice(index, 1);
+    }
+
+    setSnackbar({
+      open: true,
+      message: updatedReport.deleted ? 'Report deleted successfully' : 'Report updated successfully',
+      severity: 'success'
     });
   };
 
-  const generateProductionReport = (format) => {
-    // TODO: Replace with actual API call to get production data
-    const productionData = [
-      {
-        'Shift': 'A',
-        'Product Type': 'Hot Rolled Steel',
-        'Quantity (tons)': 150,
-        'Quality Grade': 'A',
-        'Date': '2024-03-18'
-      },
-      // Add more sample data
-    ];
-
-    if (format === 'excel') {
-      const ws = XLSX.utils.json_to_sheet(productionData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Production Report');
-      XLSX.writeFile(wb, 'production_report.xlsx');
-    } else if (format === 'pdf') {
-      const doc = new jsPDF();
-      
-      // Add title
-      doc.setFontSize(16);
-      doc.text('Production Report', 14, 15);
-      
-      // Add date range if selected
-      if (dateRange.startDate && dateRange.endDate) {
-        doc.setFontSize(10);
-        doc.text(`Period: ${dateRange.startDate} to ${dateRange.endDate}`, 14, 25);
-      }
-
-      // Add table
-      doc.autoTable({
-        head: [['Shift', 'Product Type', 'Quantity (tons)', 'Quality Grade', 'Date']],
-        body: productionData.map(item => [
-          item['Shift'],
-          item['Product Type'],
-          item['Quantity (tons)'],
-          item['Quality Grade'],
-          item['Date']
-        ]),
-        startY: 30,
-        theme: 'grid',
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [26, 35, 126] }
-      });
-
-      doc.save('production_report.pdf');
-    }
+  const handleStatusChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setSelectedStatuses(
+      typeof value === 'string' ? value.split(',') : value,
+    );
   };
 
-  const generateQualityReport = (format) => {
-    // TODO: Replace with actual API call to get quality data
-    const qualityData = [
-      {
-        'Batch Number': 'B001',
-        'Product Type': 'Hot Rolled Steel',
-        'Test Type': 'Tensile Strength',
-        'Result': 'Pass',
-        'Inspector': 'John Doe',
-        'Date': '2024-03-18'
-      },
-      // Add more sample data
-    ];
-
-    if (format === 'excel') {
-      const ws = XLSX.utils.json_to_sheet(qualityData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Quality Report');
-      XLSX.writeFile(wb, 'quality_report.xlsx');
-    } else if (format === 'pdf') {
-      const doc = new jsPDF();
-      
-      // Add title
-      doc.setFontSize(16);
-      doc.text('Quality Control Report', 14, 15);
-      
-      // Add date range if selected
-      if (dateRange.startDate && dateRange.endDate) {
-        doc.setFontSize(10);
-        doc.text(`Period: ${dateRange.startDate} to ${dateRange.endDate}`, 14, 25);
-      }
-
-      // Add table
-      doc.autoTable({
-        head: [['Batch Number', 'Product Type', 'Test Type', 'Result', 'Inspector', 'Date']],
-        body: qualityData.map(item => [
-          item['Batch Number'],
-          item['Product Type'],
-          item['Test Type'],
-          item['Result'],
-          item['Inspector'],
-          item['Date']
-        ]),
-        startY: 30,
-        theme: 'grid',
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [26, 35, 126] }
-      });
-
-      doc.save('quality_report.pdf');
-    }
+  const handleClearFilters = () => {
+    setSelectedType('');
+    setSelectedDepartment('');
+    setSearchQuery('');
+    setDateRange({ start: '', end: '' });
+    setSelectedStatuses([]);
   };
 
-  const generateMaintenanceReport = (format) => {
-    // TODO: Replace with actual API call to get maintenance data
-    const maintenanceData = [
-      {
-        'Equipment ID': 'EQ001',
-        'Equipment Name': 'Rolling Mill',
-        'Maintenance Type': 'Preventive',
-        'Priority': 'High',
-        'Status': 'Completed',
-        'Assigned To': 'Mike Smith',
-        'Scheduled Date': '2024-03-18',
-        'Completion Date': '2024-03-18'
-      },
-      // Add more sample data
-    ];
+  const filteredReports = mockReports.filter(report => {
+    const matchesType = !selectedType || report.type === selectedType;
+    const matchesDepartment = !selectedDepartment || report.department === selectedDepartment;
+    const matchesSearch = !searchQuery || 
+      report.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      report.type.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = selectedStatuses.length === 0 || selectedStatuses.includes(report.status);
+    const matchesDateRange = (!dateRange.start || report.date >= dateRange.start) &&
+      (!dateRange.end || report.date <= dateRange.end);
 
-    if (format === 'excel') {
-      const ws = XLSX.utils.json_to_sheet(maintenanceData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, 'Maintenance Report');
-      XLSX.writeFile(wb, 'maintenance_report.xlsx');
-    } else if (format === 'pdf') {
-      const doc = new jsPDF();
-      
-      // Add title
-      doc.setFontSize(16);
-      doc.text('Maintenance Report', 14, 15);
-      
-      // Add date range if selected
-      if (dateRange.startDate && dateRange.endDate) {
-        doc.setFontSize(10);
-        doc.text(`Period: ${dateRange.startDate} to ${dateRange.endDate}`, 14, 25);
-      }
+    return matchesType && matchesDepartment && matchesSearch && matchesStatus && matchesDateRange;
+  });
 
-      // Add table
-      doc.autoTable({
-        head: [['Equipment ID', 'Equipment Name', 'Maintenance Type', 'Priority', 'Status', 'Assigned To', 'Scheduled Date', 'Completion Date']],
-        body: maintenanceData.map(item => [
-          item['Equipment ID'],
-          item['Equipment Name'],
-          item['Maintenance Type'],
-          item['Priority'],
-          item['Status'],
-          item['Assigned To'],
-          item['Scheduled Date'],
-          item['Completion Date']
-        ]),
-        startY: 30,
-        theme: 'grid',
-        styles: { fontSize: 8 },
-        headStyles: { fillColor: [26, 35, 126] }
-      });
-
-      doc.save('maintenance_report.pdf');
+  const getStatusColor = (status) => {
+    switch (status.toLowerCase()) {
+      case 'approved':
+        return 'success';
+      case 'pending':
+        return 'warning';
+      case 'draft':
+        return 'info';
+      default:
+        return 'default';
     }
   };
 
   return (
-    <div className="reports-section">
-      <Typography variant="h4" gutterBottom>
-        Download Reports
-      </Typography>
-      
-      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
-        <Typography variant="h6" gutterBottom>
-          Select Date Range
-        </Typography>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} sm={4}>
-            <input
-              type="date"
-              name="startDate"
-              value={dateRange.startDate}
-              onChange={handleDateChange}
-              className="date-input"
-            />
+    <Box sx={{ p: 3 }}>
+      <Paper sx={{ p: 3 }}>
+        <Grid container spacing={2} alignItems="center" sx={{ mb: 3 }}>
+          <Grid item xs={12} md={6}>
+            <Typography variant="h5">
+              Reports Dashboard
+            </Typography>
           </Grid>
-          <Grid item xs={12} sm={4}>
-            <input
-              type="date"
-              name="endDate"
-              value={dateRange.endDate}
-              onChange={handleDateChange}
-              className="date-input"
-            />
+          <Grid item xs={12} md={6} sx={{ textAlign: 'right' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate('/reports/upload')}
+              sx={{ mr: 1 }}
+            >
+              Upload New Report
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={() => navigate('/reports/download')}
+              sx={{ mr: 1 }}
+            >
+              Download Reports
+            </Button>
+            <Button
+              variant="outlined"
+              startIcon={showFilters ? <ClearIcon /> : <FilterListIcon />}
+              onClick={() => setShowFilters(!showFilters)}
+            >
+              {showFilters ? 'Hide Filters' : 'Show Filters'}
+            </Button>
           </Grid>
         </Grid>
+
+        {showFilters && (
+          <Grid container spacing={3} sx={{ mb: 3 }}>
+            <Grid item xs={12} md={4}>
+              <TextField
+                select
+                fullWidth
+                label="Report Type"
+                value={selectedType}
+                onChange={(e) => setSelectedType(e.target.value)}
+              >
+                <MenuItem value="">All Types</MenuItem>
+                {reportTypes.map((type) => (
+                  <MenuItem key={type} value={type}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <TextField
+                select
+                fullWidth
+                label="Department"
+                value={selectedDepartment}
+                onChange={(e) => setSelectedDepartment(e.target.value)}
+              >
+                <MenuItem value="">All Departments</MenuItem>
+                {departments.map((dept) => (
+                  <MenuItem key={dept} value={dept}>
+                    {dept}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} md={4}>
+              <FormControl fullWidth>
+                <InputLabel>Status</InputLabel>
+                <Select
+                  multiple
+                  value={selectedStatuses}
+                  onChange={handleStatusChange}
+                  input={<OutlinedInput label="Status" />}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((value) => (
+                        <Chip key={value} label={value} size="small" />
+                      ))}
+                    </Box>
+                  )}
+                >
+                  {['Draft', 'Pending', 'Approved'].map((status) => (
+                    <MenuItem key={status} value={status}>
+                      <Checkbox checked={selectedStatuses.indexOf(status) > -1} />
+                      <ListItemText primary={status} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="Start Date"
+                type="date"
+                value={dateRange.start}
+                onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <TextField
+                fullWidth
+                label="End Date"
+                type="date"
+                value={dateRange.end}
+                onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+                InputLabelProps={{
+                  shrink: true,
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                fullWidth
+                label="Search Reports"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                InputProps={{
+                  startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+                  endAdornment: searchQuery && (
+                    <IconButton
+                      size="small"
+                      onClick={() => setSearchQuery('')}
+                    >
+                      <ClearIcon />
+                    </IconButton>
+                  )
+                }}
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Button
+                variant="outlined"
+                startIcon={<ClearIcon />}
+                onClick={handleClearFilters}
+              >
+                Clear All Filters
+              </Button>
+            </Grid>
+          </Grid>
+        )}
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
+
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Report Name</TableCell>
+                <TableCell>Type</TableCell>
+                <TableCell>Department</TableCell>
+                <TableCell>Date</TableCell>
+                <TableCell>Size</TableCell>
+                <TableCell>Format</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredReports.map((report) => (
+                <TableRow key={report.id}>
+                  <TableCell>{report.name}</TableCell>
+                  <TableCell>
+                    <Chip label={report.type} size="small" />
+                  </TableCell>
+                  <TableCell>{report.department}</TableCell>
+                  <TableCell>{report.date}</TableCell>
+                  <TableCell>{report.size}</TableCell>
+                  <TableCell>{report.format}</TableCell>
+                  <TableCell>
+                    <Chip 
+                      label={report.status} 
+                      size="small" 
+                      color={getStatusColor(report.status)}
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleView(report)}
+                      title="View Report"
+                    >
+                      <VisibilityIcon />
+                    </IconButton>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleDownload(report)}
+                      title="Download Report"
+                    >
+                      <DownloadIcon />
+                    </IconButton>
+                    <IconButton
+                      color="primary"
+                      onClick={() => handleEdit(report)}
+                      title="Edit Report"
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+
+        {filteredReports.length === 0 && (
+          <Box sx={{ textAlign: 'center', py: 3 }}>
+            <Typography color="text.secondary">
+              No reports found matching your criteria
+            </Typography>
+          </Box>
+        )}
       </Paper>
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={4}>
-          <Paper elevation={3} sx={{ p: 3, textAlign: 'center' }}>
-            <Typography variant="h6" gutterBottom>
-              Production Report
-            </Typography>
-            <ButtonGroup variant="contained" fullWidth>
-              <Button
-                startIcon={<DownloadIcon />}
-                onClick={() => generateProductionReport('excel')}
-              >
-                Excel
-              </Button>
-              <Button
-                startIcon={<PictureAsPdfIcon />}
-                onClick={() => generateProductionReport('pdf')}
-              >
-                PDF
-              </Button>
-            </ButtonGroup>
-          </Paper>
-        </Grid>
+      {selectedReport && (
+        <>
+          <ReportPreview
+            open={previewOpen}
+            onClose={() => setPreviewOpen(false)}
+            report={selectedReport}
+            onDownload={handleDownload}
+            onEdit={handleEdit}
+          />
+          <ReportEdit
+            open={editOpen}
+            onClose={() => setEditOpen(false)}
+            report={selectedReport}
+            onSave={handleSaveEdit}
+          />
+        </>
+      )}
 
-        <Grid item xs={12} md={4}>
-          <Paper elevation={3} sx={{ p: 3, textAlign: 'center' }}>
-            <Typography variant="h6" gutterBottom>
-              Quality Report
-            </Typography>
-            <ButtonGroup variant="contained" fullWidth>
-              <Button
-                startIcon={<DownloadIcon />}
-                onClick={() => generateQualityReport('excel')}
-              >
-                Excel
-              </Button>
-              <Button
-                startIcon={<PictureAsPdfIcon />}
-                onClick={() => generateQualityReport('pdf')}
-              >
-                PDF
-              </Button>
-            </ButtonGroup>
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12} md={4}>
-          <Paper elevation={3} sx={{ p: 3, textAlign: 'center' }}>
-            <Typography variant="h6" gutterBottom>
-              Maintenance Report
-            </Typography>
-            <ButtonGroup variant="contained" fullWidth>
-              <Button
-                startIcon={<DownloadIcon />}
-                onClick={() => generateMaintenanceReport('excel')}
-              >
-                Excel
-              </Button>
-              <Button
-                startIcon={<PictureAsPdfIcon />}
-                onClick={() => generateMaintenanceReport('pdf')}
-              >
-                PDF
-              </Button>
-            </ButtonGroup>
-          </Paper>
-        </Grid>
-      </Grid>
-    </div>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert 
+          onClose={() => setSnackbar({ ...snackbar, open: false })} 
+          severity={snackbar.severity}
+          sx={{ width: '100%' }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
+    </Box>
   );
 }
 
