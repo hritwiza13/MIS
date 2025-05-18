@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Routes, Route, Navigate, HashRouter as Router } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, HashRouter as Router, useNavigate } from 'react-router-dom';
 import { Box, Container } from '@mui/material';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
@@ -18,6 +18,7 @@ import ReportDownload from './components/reports/ReportDownload';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
+  const navigate = useNavigate ? useNavigate() : null;
 
   const handleLogin = (data) => {
     setUserInfo({
@@ -32,10 +33,19 @@ function App() {
     setUserInfo(null);
   };
 
+  // Redirect to department dashboard after login
+  useEffect(() => {
+    if (isAuthenticated && userInfo && navigate) {
+      navigate(`/${userInfo.department}`);
+    }
+  }, [isAuthenticated, userInfo, navigate]);
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={
+          isAuthenticated && userInfo ? <Navigate to={`/${userInfo.department}`} replace /> : <Home />
+        } />
         <Route path="/login" element={<Login onLogin={handleLogin} />} />
         {isAuthenticated && userInfo && (
           <Route
