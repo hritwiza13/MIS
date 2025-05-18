@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/MIS/static/css/main.f9718d37.css",
-    "main.js": "/MIS/static/js/main.a21568ba.js",
-    "index.html": "/MIS/index.html",
-    "main.f9718d37.css.map": "/MIS/static/css/main.f9718d37.css.map",
-    "main.a21568ba.js.map": "/MIS/static/js/main.a21568ba.js.map"
+    "main.css": "/hindalco-steel-mis/static/css/main.f9718d37.css",
+    "main.js": "/hindalco-steel-mis/static/js/main.0349274c.js",
+    "index.html": "/hindalco-steel-mis/index.html",
+    "main.f9718d37.css.map": "/hindalco-steel-mis/static/css/main.f9718d37.css.map",
+    "main.0349274c.js.map": "/hindalco-steel-mis/static/js/main.0349274c.js.map"
   },
   "entrypoints": [
     "static/css/main.f9718d37.css",
-    "static/js/main.a21568ba.js"
+    "static/js/main.0349274c.js"
   ]
 }
