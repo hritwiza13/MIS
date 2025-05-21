@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "https://hritwiza13.github.io/MIS/static/css/main.f9718d37.css",
-    "main.js": "https://hritwiza13.github.io/MIS/static/js/main.b8d698e5.js",
-    "index.html": "https://hritwiza13.github.io/MIS/index.html",
-    "main.f9718d37.css.map": "https://hritwiza13.github.io/MIS/static/css/main.f9718d37.css.map",
-    "main.b8d698e5.js.map": "https://hritwiza13.github.io/MIS/static/js/main.b8d698e5.js.map"
+    "main.css": "/MIS/static/css/main.f9718d37.css",
+    "main.js": "/MIS/static/js/main.fa058943.js",
+    "index.html": "/MIS/index.html",
+    "main.f9718d37.css.map": "/MIS/static/css/main.f9718d37.css.map",
+    "main.fa058943.js.map": "/MIS/static/js/main.fa058943.js.map"
   },
   "entrypoints": [
     "static/css/main.f9718d37.css",
-    "static/js/main.b8d698e5.js"
+    "static/js/main.fa058943.js"
   ]
 }
