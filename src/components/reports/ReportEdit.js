@@ -19,6 +19,7 @@ import {
   Save as SaveIcon,
   Delete as DeleteIcon
 } from '@mui/icons-material';
+import { useTheme, alpha } from '@mui/material/styles';
 
 const reportTypes = [
   'Production Report',
@@ -43,6 +44,19 @@ function ReportEdit({ open, onClose, report, onSave }) {
   const [editedReport, setEditedReport] = useState(report);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const theme = useTheme();
+  const enhancedStyles = {
+    dialogContent: {
+      backgroundColor: alpha(theme.palette.background.default, 0.6),
+      backdropFilter: 'blur(5px)',
+    },
+    textField: {
+      // Add styling for text fields if needed
+    },
+    button: {
+      // Add styling for buttons if needed
+    },
+  };
 
   const handleChange = (field) => (event) => {
     setEditedReport({
@@ -98,7 +112,7 @@ function ReportEdit({ open, onClose, report, onSave }) {
           </IconButton>
         </Box>
       </DialogTitle>
-      <DialogContent dividers>
+      <DialogContent dividers sx={enhancedStyles.dialogContent}>
         {error && (
           <Alert severity="error" sx={{ mb: 2 }}>
             {error}
@@ -113,6 +127,7 @@ function ReportEdit({ open, onClose, report, onSave }) {
               value={editedReport.name}
               onChange={handleChange('name')}
               margin="normal"
+              sx={enhancedStyles.textField}
             />
           </Grid>
 
@@ -124,6 +139,7 @@ function ReportEdit({ open, onClose, report, onSave }) {
               value={editedReport.type}
               onChange={handleChange('type')}
               margin="normal"
+              sx={enhancedStyles.textField}
             >
               {reportTypes.map((type) => (
                 <MenuItem key={type} value={type}>
@@ -141,6 +157,7 @@ function ReportEdit({ open, onClose, report, onSave }) {
               value={editedReport.department}
               onChange={handleChange('department')}
               margin="normal"
+              sx={enhancedStyles.textField}
             >
               {departments.map((dept) => (
                 <MenuItem key={dept} value={dept}>
@@ -161,6 +178,7 @@ function ReportEdit({ open, onClose, report, onSave }) {
               InputLabelProps={{
                 shrink: true,
               }}
+              sx={enhancedStyles.textField}
             />
           </Grid>
 
@@ -172,6 +190,7 @@ function ReportEdit({ open, onClose, report, onSave }) {
               value={editedReport.status}
               onChange={handleChange('status')}
               margin="normal"
+              sx={enhancedStyles.textField}
             >
               {statuses.map((status) => (
                 <MenuItem key={status} value={status}>
@@ -191,6 +210,7 @@ function ReportEdit({ open, onClose, report, onSave }) {
               onChange={handleChange('description')}
               margin="normal"
               placeholder="Add a description for this report..."
+              sx={enhancedStyles.textField}
             />
           </Grid>
         </Grid>
@@ -201,12 +221,14 @@ function ReportEdit({ open, onClose, report, onSave }) {
           color="error"
           onClick={handleDelete}
           disabled={loading}
+          sx={enhancedStyles.button}
         >
           Delete
         </Button>
         <Button
           onClick={onClose}
           disabled={loading}
+          sx={enhancedStyles.button}
         >
           Cancel
         </Button>
@@ -216,6 +238,7 @@ function ReportEdit({ open, onClose, report, onSave }) {
           startIcon={loading ? <CircularProgress size={20} /> : <SaveIcon />}
           onClick={handleSave}
           disabled={loading}
+          sx={enhancedStyles.button}
         >
           Save Changes
         </Button>

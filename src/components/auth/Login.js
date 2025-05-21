@@ -13,10 +13,10 @@ import {
   Grid
 } from '@mui/material';
 import { Lock as LockIcon } from '@mui/icons-material';
+import { useAuth } from '../../contexts/AuthContext';
 
 function Login({ onLogin }) {
   const [formData, setFormData] = useState({
-    username: '',
     password: '',
     department: '',
     employeeName: '',
@@ -24,6 +24,7 @@ function Login({ onLogin }) {
   });
 
   const departments = [
+    { value: 'admin', label: 'Administrator' },
     { value: 'production', label: 'Production' },
     { value: 'quality', label: 'Quality Control' },
     { value: 'maintenance', label: 'Maintenance' },
@@ -41,14 +42,18 @@ function Login({ onLogin }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onLogin({
+    // Call the login function from AuthContext
+    login({
       department: formData.department,
       user: {
         name: formData.employeeName,
         id: formData.employeeId,
-        username: formData.username
-      }
+        username: formData.employeeId,
+        isAdmin: formData.department === 'admin'
+      },
+      password: formData.password // Include password in data passed to login context if needed by context logic
     });
+    // Note: Navigation will be handled by the component that calls the login function (e.g., Welcome.js or App.js)
   };
 
   return (
@@ -94,16 +99,6 @@ function Login({ onLogin }) {
                   label="Employee ID"
                   name="employeeId"
                   value={formData.employeeId}
-                  onChange={handleChange}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  required
-                  fullWidth
-                  label="Username"
-                  name="username"
-                  value={formData.username}
                   onChange={handleChange}
                 />
               </Grid>

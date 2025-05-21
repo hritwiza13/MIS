@@ -8,11 +8,38 @@ import {
   CardContent,
   CardHeader
 } from '@mui/material';
+import { useTheme, alpha } from '@mui/material/styles';
 import FileUpload from '../common/FileUpload';
 
 function Coloring({ userInfo }) {
+  const theme = useTheme();
+  const enhancedStyles = {
+    container: {
+      py: 4,
+      backgroundColor: alpha(theme.palette.background.default, 0.8),
+      minHeight: 'calc(100vh - 64px)', // Adjust for navbar height
+    },
+    card: {
+      height: '100%',
+      transition: 'all 0.3s ease',
+      '&:hover': {
+        transform: 'translateY(-4px)',
+        boxShadow: `0 8px 24px ${alpha(theme.palette.primary.main, 0.15)}`,
+      },
+      background: 'rgba(255, 255, 255, 0.9)',
+      backdropFilter: 'blur(10px)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+      borderRadius: theme.shape.borderRadius,
+    },
+    cardHeader: {
+      backgroundColor: alpha(theme.palette.primary.main, 0.05),
+      fontWeight: 'bold',
+      color: theme.palette.primary.main,
+    },
+  };
+
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="lg" sx={enhancedStyles.container}>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
           Coloring Department Dashboard
@@ -25,8 +52,8 @@ function Coloring({ userInfo }) {
       <Grid container spacing={3}>
         {/* Coloring Schedule Card */}
         <Grid item xs={12} md={6}>
-          <Card>
-            <CardHeader title="Coloring Schedule" />
+          <Card sx={enhancedStyles.card}>
+            <CardHeader title="Coloring Schedule" sx={enhancedStyles.cardHeader} />
             <CardContent>
               <Typography variant="body1">
                 Current coloring schedule and upcoming tasks will be displayed here.
@@ -37,8 +64,8 @@ function Coloring({ userInfo }) {
 
         {/* Color Inventory Card */}
         <Grid item xs={12} md={6}>
-          <Card>
-            <CardHeader title="Color Inventory" />
+          <Card sx={enhancedStyles.card}>
+            <CardHeader title="Color Inventory" sx={enhancedStyles.cardHeader} />
             <CardContent>
               <Typography variant="body1">
                 Current color material inventory levels will be shown here.
@@ -49,8 +76,8 @@ function Coloring({ userInfo }) {
 
         {/* Quality Control Card */}
         <Grid item xs={12} md={6}>
-          <Card>
-            <CardHeader title="Quality Control" />
+          <Card sx={enhancedStyles.card}>
+            <CardHeader title="Quality Control" sx={enhancedStyles.cardHeader} />
             <CardContent>
               <Typography variant="body1">
                 Color quality inspection results will be displayed here.
@@ -61,8 +88,8 @@ function Coloring({ userInfo }) {
 
         {/* Coloring Reports Card */}
         <Grid item xs={12} md={6}>
-          <Card>
-            <CardHeader title="Coloring Reports" />
+          <Card sx={enhancedStyles.card}>
+            <CardHeader title="Coloring Reports" sx={enhancedStyles.cardHeader} />
             <CardContent>
               <Typography variant="body1">
                 Daily coloring reports and statistics will be shown here.

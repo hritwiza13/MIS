@@ -1,207 +1,272 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Box,
-  Paper,
+  Container,
   Typography,
-  Button,
+  Paper,
+  Box,
   Grid,
-  TextField,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
   MenuItem,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  IconButton,
-  Chip,
-  Alert
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import {
   Download as DownloadIcon,
-  Search as SearchIcon,
-  FilterList as FilterListIcon
+  TableChart as ExcelIcon
 } from '@mui/icons-material';
-
-const reportTypes = [
-  'Production Report',
-  'Quality Report',
-  'Maintenance Report',
-  'Inventory Report',
-  'Scrap Report',
-  'Efficiency Report'
-];
-
-const departments = [
-  'Production',
-  'Quality Control',
-  'Maintenance',
-  'Packaging',
-  'Coloring'
-];
-
-// Mock data for demonstration
-const mockReports = [
-  {
-    id: 1,
-    name: 'Production Report - January 2024',
-    type: 'Production Report',
-    department: 'Production',
-    date: '2024-01-15',
-    size: '2.5 MB',
-    format: 'PDF'
-  },
-  {
-    id: 2,
-    name: 'Quality Control Report - Q1 2024',
-    type: 'Quality Report',
-    department: 'Quality Control',
-    date: '2024-01-20',
-    size: '1.8 MB',
-    format: 'XLSX'
-  },
-  {
-    id: 3,
-    name: 'Maintenance Schedule 2024',
-    type: 'Maintenance Report',
-    department: 'Maintenance',
-    date: '2024-01-25',
-    size: '3.2 MB',
-    format: 'PDF'
-  }
-];
+import { useTheme, alpha } from '@mui/material/styles';
 
 function ReportDownload() {
-  const [selectedType, setSelectedType] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedReport, setSelectedReport] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  const userDepartment = localStorage.getItem('userDepartment');
+  const isAdmin = localStorage.getItem('isAdmin') === 'true';
+  const theme = useTheme();
 
-  const handleDownload = (report) => {
-    // Simulate file download
-    console.log(`Downloading ${report.name}`);
-    // In a real application, this would trigger the actual file download
+  const enhancedStyles = {
+    container: {
+      py: 4,
+      backgroundColor: alpha(theme.palette.background.default, 0.8),
+      minHeight: 'calc(100vh - 64px)', // Adjust for navbar height
+    },
+    paperSection: {
+      p: 3,
+      mt: 3,
+      borderRadius: theme.shape.borderRadius,
+      background: 'rgba(255, 255, 255, 0.9)',
+      backdropFilter: 'blur(10px)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+    },
   };
 
-  const filteredReports = mockReports.filter(report => {
-    const matchesType = !selectedType || report.type === selectedType;
-    const matchesDepartment = !selectedDepartment || report.department === selectedDepartment;
-    const matchesSearch = !searchQuery || 
-      report.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      report.type.toLowerCase().includes(searchQuery.toLowerCase());
+  const departments = [
+    { value: 'production', label: 'Production' },
+    { value: 'quality', label: 'Quality Control' },
+    { value: 'maintenance', label: 'Maintenance' },
+    { value: 'packaging', label: 'Packaging' },
+    { value: 'coloring', label: 'Coloring' }
+  ];
 
-    return matchesType && matchesDepartment && matchesSearch;
-  });
+  const fileType = {
+    value: 'xlsx',
+    label: 'Excel Spreadsheet',
+    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    icon: <ExcelIcon />
+  };
+
+  const reports = {
+    production: [
+      { id: 'prod_daily', name: 'Daily Production Report' },
+      { id: 'prod_weekly', name: 'Weekly Production Summary' },
+      { id: 'prod_monthly', name: 'Monthly Production Analysis' }
+    ],
+    quality: [
+      { id: 'qual_inspection', name: 'Quality Inspection Report' },
+      { id: 'qual_metrics', name: 'Quality Metrics Report' },
+      { id: 'qual_compliance', name: 'Compliance Report' }
+    ],
+    maintenance: [
+      { id: 'maint_schedule', name: 'Maintenance Schedule' },
+      { id: 'maint_breakdown', name: 'Breakdown Report' },
+      { id: 'maint_preventive', name: 'Preventive Maintenance Report' }
+    ],
+    packaging: [
+      { id: 'pack_daily', name: 'Daily Packaging Report' },
+      { id: 'pack_inventory', name: 'Packaging Inventory Report' },
+      { id: 'pack_quality', name: 'Packaging Quality Report' }
+    ],
+    coloring: [
+      { id: 'color_batch', name: 'Batch Coloring Report' },
+      { id: 'color_quality', name: 'Color Quality Report' },
+      { id: 'color_inventory', name: 'Color Inventory Report' }
+    ]
+  };
+
+  useEffect(() => {
+    // Set initial department for non-admin users
+    if (!isAdmin && userDepartment) {
+      setSelectedDepartment(userDepartment);
+    }
+  }, [isAdmin, userDepartment]);
+
+  // Update current date and time every second
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Format date and time for display
+  const formatDateTime = (date) => {
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: true
+    });
+  };
+
+  // Format date and time for filename
+  const formatDateTimeForFilename = (date) => {
+    return date.toISOString()
+      .replace(/[:.]/g, '-')
+      .replace('T', '_')
+      .slice(0, 19);
+  };
+
+  const handleDepartmentChange = (event) => {
+    setSelectedDepartment(event.target.value);
+    setSelectedReport('');
+    setError('');
+  };
+
+  const handleReportChange = (event) => {
+    setSelectedReport(event.target.value);
+    setError('');
+  };
+
+  const handleDownload = async () => {
+    if (!selectedDepartment || !selectedReport) {
+      setError('Please select both department and report');
+      return;
+    }
+
+    // Check if user has access to the selected department
+    if (!isAdmin && selectedDepartment !== userDepartment) {
+      setError('You do not have access to this department\'s reports');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+
+    try {
+      // Get the report name from the reports object
+      const reportInfo = reports[selectedDepartment].find(r => r.id === selectedReport);
+      if (!reportInfo) {
+        throw new Error('Report not found');
+      }
+
+      // Create a file name with current date and time
+      const timestamp = formatDateTimeForFilename(currentDateTime);
+      const fileName = `${selectedDepartment}_${selectedReport}_${timestamp}.${fileType.value}`;
+      
+      // Create a mock file (in a real application, this would be fetched from a server)
+      const mockFile = new Blob(['Mock file content'], { type: fileType.mimeType });
+      
+      // Create a download link
+      const url = window.URL.createObjectURL(mockFile);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', fileName);
+      
+      // Append to body, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up the URL object
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      setError('Failed to download report. Please try again.');
+      console.error('Download error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Paper sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom>
+    <Container maxWidth="lg" sx={enhancedStyles.container}>
+      <Box sx={{ mt: 4, mb: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom>
           Download Reports
         </Typography>
+        
+        <Paper sx={enhancedStyles.paperSection}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" color="text.secondary" align="right">
+                Current Time: {formatDateTime(currentDateTime)}
+              </Typography>
+            </Grid>
 
-        <Grid container spacing={3} sx={{ mb: 3 }}>
-          <Grid item xs={12} md={4}>
-            <TextField
-              select
-              fullWidth
-              label="Report Type"
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-            >
-              <MenuItem value="">All Types</MenuItem>
-              {reportTypes.map((type) => (
-                <MenuItem key={type} value={type}>
-                  {type}
-                </MenuItem>
-              ))}
-            </TextField>
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel>Department</InputLabel>
+                <Select
+                  value={selectedDepartment}
+                  label="Department"
+                  onChange={handleDepartmentChange}
+                  disabled={!isAdmin || loading}
+                >
+                  {departments.map((dept) => (
+                    <MenuItem key={dept.value} value={dept.value}>
+                      {dept.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            
+            <Grid item xs={12} md={6}>
+              <FormControl fullWidth>
+                <InputLabel>Report</InputLabel>
+                <Select
+                  value={selectedReport}
+                  label="Report"
+                  onChange={handleReportChange}
+                  disabled={!selectedDepartment || loading}
+                >
+                  {selectedDepartment && reports[selectedDepartment]?.map((report) => (
+                    <MenuItem key={report.id} value={report.id}>
+                      {report.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <ExcelIcon color="primary" />
+                <Typography variant="body1" color="text.secondary">
+                  Reports will be downloaded in Excel format
+                </Typography>
+              </Box>
+            </Grid>
+
+            {error && (
+              <Grid item xs={12}>
+                <Alert severity="error">{error}</Alert>
+              </Grid>
+            )}
+
+            <Grid item xs={12}>
+              <Button
+                variant="contained"
+                startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <DownloadIcon />}
+                onClick={handleDownload}
+                disabled={!selectedDepartment || !selectedReport || loading}
+                sx={{ mt: 2 }}
+              >
+                {loading ? 'Downloading...' : 'Download Report'}
+              </Button>
+            </Grid>
           </Grid>
-
-          <Grid item xs={12} md={4}>
-            <TextField
-              select
-              fullWidth
-              label="Department"
-              value={selectedDepartment}
-              onChange={(e) => setSelectedDepartment(e.target.value)}
-            >
-              <MenuItem value="">All Departments</MenuItem>
-              {departments.map((dept) => (
-                <MenuItem key={dept} value={dept}>
-                  {dept}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-
-          <Grid item xs={12} md={4}>
-            <TextField
-              fullWidth
-              label="Search Reports"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              InputProps={{
-                startAdornment: <SearchIcon sx={{ mr: 1, color: 'text.secondary' }} />
-              }}
-            />
-          </Grid>
-        </Grid>
-
-        {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
-            {error}
-          </Alert>
-        )}
-
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Report Name</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell>Department</TableCell>
-                <TableCell>Date</TableCell>
-                <TableCell>Size</TableCell>
-                <TableCell>Format</TableCell>
-                <TableCell align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredReports.map((report) => (
-                <TableRow key={report.id}>
-                  <TableCell>{report.name}</TableCell>
-                  <TableCell>
-                    <Chip label={report.type} size="small" />
-                  </TableCell>
-                  <TableCell>{report.department}</TableCell>
-                  <TableCell>{report.date}</TableCell>
-                  <TableCell>{report.size}</TableCell>
-                  <TableCell>{report.format}</TableCell>
-                  <TableCell align="right">
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleDownload(report)}
-                      title="Download Report"
-                    >
-                      <DownloadIcon />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        {filteredReports.length === 0 && (
-          <Box sx={{ textAlign: 'center', py: 3 }}>
-            <Typography color="text.secondary">
-              No reports found matching your criteria
-            </Typography>
-          </Box>
-        )}
-      </Paper>
-    </Box>
+        </Paper>
+      </Box>
+    </Container>
   );
 }
 

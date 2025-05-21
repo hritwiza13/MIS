@@ -1,215 +1,192 @@
 import React from 'react';
+import { Box, Typography, Paper, Container, Button, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import {
-  Box,
-  Container,
-  Typography,
-  Paper,
-  Grid,
-  Card,
-  CardContent,
-  Button,
-  useTheme
-} from '@mui/material';
-import {
-  Factory as FactoryIcon,
-  Assessment as AssessmentIcon,
-  Security as SecurityIcon,
-  Speed as SpeedIcon
-} from '@mui/icons-material';
+import FactoryIcon from '@mui/icons-material/Factory';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import SecurityIcon from '@mui/icons-material/Security';
 
 function Home() {
-  const theme = useTheme();
   const navigate = useNavigate();
 
-  const features = [
-    {
-      icon: <FactoryIcon sx={{ fontSize: 40 }} />,
-      title: 'Production Management',
-      description: 'Streamline your production processes with real-time monitoring and analytics.'
-    },
-    {
-      icon: <AssessmentIcon sx={{ fontSize: 40 }} />,
-      title: 'Quality Control',
-      description: 'Maintain high standards with comprehensive quality control systems.'
-    },
-    {
-      icon: <SecurityIcon sx={{ fontSize: 40 }} />,
-      title: 'Safety First',
-      description: 'Ensure workplace safety with our integrated safety management system.'
-    },
-    {
-      icon: <SpeedIcon sx={{ fontSize: 40 }} />,
-      title: 'Efficiency Tracking',
-      description: 'Monitor and improve operational efficiency with detailed analytics.'
-    }
-  ];
+  // Construct the public URL for the logo
+  const logoUrl = process.env.PUBLIC_URL + '/images/logo.jpg';
 
   return (
-    <Box>
-      {/* Hero Section */}
-      <Box
+    <Box
+      sx={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #1a237e 0%, #0d47a1 100%)',
+        // Optional: Add a subtle background pattern
+        // backgroundImage: `url(${process.env.PUBLIC_URL}/path/to/your/pattern.png)`,
+        // backgroundRepeat: 'repeat',
+        // backgroundSize: 'contain',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 3,
+        position: 'relative', // Needed for absolute positioning of potential overlay
+        overflow: 'hidden', // Hide overflow if using background effects
+      }}
+    >
+      {/* Optional: Add a subtle overlay */}
+      {/* <Box
         sx={{
-          bgcolor: 'primary.main',
-          color: 'white',
-          py: 8,
-          mb: 6
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.1)', // Adjust transparency as needed
+          zIndex: 1,
         }}
-      >
-        <Container maxWidth="lg">
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <Typography variant="h2" component="h1" gutterBottom>
-                Welcome to Hindalco
-              </Typography>
-              <Typography variant="h5" paragraph>
-                Empowering Excellence in Manufacturing
-              </Typography>
-              <Typography variant="body1" paragraph>
-                Your comprehensive Management Information System for streamlined operations,
-                enhanced productivity, and data-driven decision making.
-              </Typography>
-              <Button
-                variant="contained"
-                color="secondary"
-                size="large"
-                sx={{ mt: 2 }}
-                onClick={() => navigate('/login')}
-              >
-                Get Started
-              </Button>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Box
-                sx={{
-                  width: '100%',
-                  height: 400,
+      /> */}
+
+      <Container maxWidth="lg" sx={{ zIndex: 2, position: 'relative' }}> {/* Ensure content is above overlay */}
+        <Paper
+          elevation={10} // Increased elevation for more prominence
+          sx={{
+            padding: { xs: 3, md: 5 }, // Responsive padding
+            textAlign: 'center',
+            background: 'rgba(255, 255, 255, 0.98)',
+            borderRadius: 2,
+            boxShadow: '0 12px 40px rgba(0, 0, 0, 0.15)', // Enhanced shadow
+            backdropFilter: 'blur(5px)', // Subtle blur effect
+          }}
+        >
+          {/* Logo Section */}
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              mb: { xs: 3, md: 5 }, // Responsive margin bottom
+            }}
+          >
+            <Box
+              component="img"
+              src={logoUrl}
+              alt="Hindalco Logo"
+              sx={{
+                height: { xs: '60px', md: '80px' }, // Responsive height
+                width: 'auto',
+                objectFit: 'contain',
+              }}
+            />
+          </Box>
+
+          <Typography
+            variant="h4" // Slightly smaller for better hierarchy
+            component="h1"
+            sx={{
+              color: '#1a237e',
+              fontWeight: 'bold',
+              marginBottom: { xs: 1, md: 2 }, // Responsive margin bottom
+              textShadow: '1px 1px 2px rgba(0,0,0,0.1)',
+            }}
+          >
+            Hindalco Industries
+          </Typography>
+          
+          <Typography
+            variant="h6" // Slightly smaller for better hierarchy
+            sx={{
+              color: '#0d47a1',
+              marginBottom: { xs: 3, md: 4 }, // Responsive margin bottom
+              fontWeight: 'medium',
+            }}
+          >
+            Management Information System
+          </Typography>
+
+          <Grid container spacing={{ xs: 2, md: 4 }} sx={{ mb: { xs: 4, md: 6 } }}> {/* Responsive spacing */}
+            <Grid item xs={12} md={4}>
+              <Box 
+                sx={{ 
+                  p: { xs: 2, md: 3 }, // Responsive padding
                   borderRadius: 2,
-                  boxShadow: 3,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  background: 'linear-gradient(45deg, #1976d2 30%, #42a5f5 90%)',
-                  position: 'relative',
-                  overflow: 'hidden'
+                  transition: 'transform 0.3s ease-in-out, boxShadow 0.3s ease-in-out', // Smoother transition
+                  '&:hover': {
+                    transform: 'translateY(-8px)', // More pronounced hover effect
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.2)', // Enhanced hover shadow
+                  }
                 }}
               >
-                <FactoryIcon
-                  sx={{
-                    fontSize: 200,
-                    color: 'white',
-                    opacity: 0.8,
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)'
-                  }}
-                />
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    background: 'radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.2) 100%)'
-                  }}
-                />
-                <Typography
-                  variant="h4"
-                  sx={{
-                    color: 'white',
-                    position: 'absolute',
-                    bottom: 32,
-                    left: 32,
-                    fontWeight: 'bold',
-                    textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  Hindalco Industries
+                <FactoryIcon sx={{ fontSize: { xs: 50, md: 60 }, color: '#1a237e', mb: 2 }} /> {/* Responsive icon size */}
+                <Typography variant="h6" sx={{ color: '#1a237e', mb: 1, fontWeight: 'bold' }}>
+                  Production Management
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Track and optimize production processes
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Box 
+                sx={{ 
+                  p: { xs: 2, md: 3 }, // Responsive padding
+                  borderRadius: 2,
+                  transition: 'transform 0.3s ease-in-out, boxShadow 0.3s ease-in-out', // Smoother transition
+                  '&:hover': {
+                    transform: 'translateY(-8px)', // More pronounced hover effect
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.2)', // Enhanced hover shadow
+                  }
+                }}
+              >
+                <AssessmentIcon sx={{ fontSize: { xs: 50, md: 60 }, color: '#1a237e', mb: 2 }} /> {/* Responsive icon size */}
+                <Typography variant="h6" sx={{ color: '#1a237e', mb: 1, fontWeight: 'bold' }}>
+                  Quality Control
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Monitor and maintain product quality standards
+                </Typography>
+              </Box>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Box 
+                sx={{ 
+                  p: { xs: 2, md: 3 }, // Responsive padding
+                  borderRadius: 2,
+                  transition: 'transform 0.3s ease-in-out, boxShadow 0.3s ease-in-out', // Smoother transition
+                  '&:hover': {
+                    transform: 'translateY(-8px)', // More pronounced hover effect
+                    boxShadow: '0 8px 25px rgba(0,0,0,0.2)', // Enhanced hover shadow
+                  }
+                }}
+              >
+                <SecurityIcon sx={{ fontSize: { xs: 50, md: 60 }, color: '#1a237e', mb: 2 }} /> {/* Responsive icon size */}
+                <Typography variant="h6" sx={{ color: '#1a237e', mb: 1, fontWeight: 'bold' }}>
+                  Secure Access
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Role-based access control for all departments
                 </Typography>
               </Box>
             </Grid>
           </Grid>
-        </Container>
-      </Box>
 
-      {/* Features Section */}
-      <Container maxWidth="lg" sx={{ mb: 8 }}>
-        <Typography variant="h3" component="h2" align="center" gutterBottom>
-          Key Features
-        </Typography>
-        <Typography variant="h6" align="center" color="text.secondary" paragraph>
-          Discover how our system can transform your operations
-        </Typography>
-        <Grid container spacing={4} sx={{ mt: 2 }}>
-          {features.map((feature, index) => (
-            <Grid item xs={12} sm={6} md={3} key={index}>
-              <Card
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  transition: 'transform 0.2s',
-                  '&:hover': {
-                    transform: 'translateY(-8px)'
-                  }
-                }}
-              >
-                <CardContent sx={{ flexGrow: 1, textAlign: 'center' }}>
-                  <Box sx={{ color: 'primary.main', mb: 2 }}>
-                    {feature.icon}
-                  </Box>
-                  <Typography variant="h6" component="h3" gutterBottom>
-                    {feature.title}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {feature.description}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+          <Box sx={{ display: 'flex', justifyContent: 'center', gap: { xs: 1, md: 2 } }}> {/* Responsive gap */}
+            <Button
+              variant="contained"
+              size="large"
+              onClick={() => navigate('/login')}
+              sx={{
+                padding: { xs: '10px 20px', md: '12px 30px' }, // Responsive padding
+                fontSize: { xs: '1rem', md: '1.1rem' }, // Responsive font size
+                background: 'linear-gradient(45deg, #1a237e 30%, #0d47a1 90%)',
+                boxShadow: '0 5px 15px 2px rgba(26, 35, 126, .4)', // Enhanced shadow
+                transition: 'transform 0.2s ease-in-out, boxShadow 0.2s ease-in-out', // Smoother transition
+                '&:hover': {
+                  background: 'linear-gradient(45deg, #0d47a1 30%, #1a237e 90%)',
+                  boxShadow: '0 8px 20px 2px rgba(26, 35, 126, .6)', // Enhanced hover shadow
+                  transform: 'translateY(-2px)', // Subtle hover lift
+                },
+              }}
+            >
+              Login to Dashboard
+            </Button>
+          </Box>
+        </Paper>
       </Container>
-
-      {/* Stats Section */}
-      <Box sx={{ bgcolor: 'grey.100', py: 8 }}>
-        <Container maxWidth="lg">
-          <Grid container spacing={4} justifyContent="center">
-            <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 3, textAlign: 'center' }}>
-                <Typography variant="h3" color="primary" gutterBottom>
-                  99.9%
-                </Typography>
-                <Typography variant="h6">
-                  System Uptime
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 3, textAlign: 'center' }}>
-                <Typography variant="h3" color="primary" gutterBottom>
-                  24/7
-                </Typography>
-                <Typography variant="h6">
-                  Support Available
-                </Typography>
-              </Paper>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Paper sx={{ p: 3, textAlign: 'center' }}>
-                <Typography variant="h3" color="primary" gutterBottom>
-                  1000+
-                </Typography>
-                <Typography variant="h6">
-                  Active Users
-                </Typography>
-              </Paper>
-            </Grid>
-          </Grid>
-        </Container>
-      </Box>
     </Box>
   );
 }

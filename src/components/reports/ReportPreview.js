@@ -24,11 +24,39 @@ import {
   Info as InfoIcon,
   History as HistoryIcon
 } from '@mui/icons-material';
+import { useTheme, alpha } from '@mui/material/styles';
 
 function ReportPreview({ open, onClose, report, onDownload, onEdit }) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState(0);
   const [previewContent, setPreviewContent] = useState(null);
+  const theme = useTheme();
+  const enhancedStyles = {
+    dialogContent: {
+      backgroundColor: alpha(theme.palette.background.default, 0.6),
+      backdropFilter: 'blur(5px)',
+    },
+    paperSection: {
+      p: 2,
+      mb: 2,
+      borderRadius: theme.shape.borderRadius,
+      background: 'rgba(255, 255, 255, 0.9)',
+      backdropFilter: 'blur(10px)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+    },
+    previewBox: {
+      border: '1px solid #e0e0e0',
+      borderRadius: 1,
+      p: 2,
+      minHeight: '400px',
+      bgcolor: alpha(theme.palette.grey[100], 0.8),
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      textAlign: 'center',
+    },
+  };
 
   useEffect(() => {
     if (open) {
@@ -80,17 +108,10 @@ function ReportPreview({ open, onClose, report, onDownload, onEdit }) {
     switch (activeTab) {
       case 0: // Preview
         return (
-          <Box 
-            sx={{ 
-              border: '1px solid #e0e0e0', 
-              borderRadius: 1, 
-              p: 2, 
-              minHeight: '400px',
-              bgcolor: '#f5f5f5'
-            }}
+          <Box sx={enhancedStyles.previewBox}
           >
             {report.format === 'PDF' ? (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Box>
                 <DescriptionIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
                 <Typography variant="h6" color="text.secondary">
                   PDF Preview
@@ -100,7 +121,7 @@ function ReportPreview({ open, onClose, report, onDownload, onEdit }) {
                 </Typography>
               </Box>
             ) : report.format === 'XLSX' ? (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Box>
                 <DescriptionIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
                 <Typography variant="h6" color="text.secondary">
                   Excel Preview
@@ -110,7 +131,7 @@ function ReportPreview({ open, onClose, report, onDownload, onEdit }) {
                 </Typography>
               </Box>
             ) : (
-              <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Box>
                 <DescriptionIcon sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
                 <Typography variant="h6" color="text.secondary">
                   Preview not available for this file type
@@ -169,7 +190,7 @@ function ReportPreview({ open, onClose, report, onDownload, onEdit }) {
           <Box sx={{ p: 2 }}>
             <Typography variant="h6" sx={{ mb: 2 }}>Version History</Typography>
             {previewContent?.history.map((item, index) => (
-              <Paper key={index} sx={{ p: 2, mb: 2 }}>
+              <Paper key={index} sx={enhancedStyles.paperSection}>
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={12} md={4}>
                     <Typography variant="subtitle2" color="textSecondary">Date</Typography>
@@ -222,7 +243,7 @@ function ReportPreview({ open, onClose, report, onDownload, onEdit }) {
         </Tabs>
       </Box>
 
-      <DialogContent dividers>
+      <DialogContent dividers sx={enhancedStyles.dialogContent}>
         <Grid container spacing={2} sx={{ mb: 3 }}>
           <Grid item xs={12} md={6}>
             <Typography variant="subtitle1" color="textSecondary">Report Name</Typography>

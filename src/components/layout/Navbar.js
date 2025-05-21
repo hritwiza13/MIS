@@ -15,9 +15,11 @@ import {
   Settings as SettingsIcon,
   AccountCircle as AccountCircleIcon
 } from '@mui/icons-material';
+import { useAuth } from '../../contexts/AuthContext';
 
-function Navbar({ userInfo, onLogout }) {
+function Navbar() {
   const [anchorEl, setAnchorEl] = useState(null);
+  const { userInfo, logout } = useAuth();
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -29,7 +31,7 @@ function Navbar({ userInfo, onLogout }) {
 
   const handleLogout = () => {
     handleClose();
-    onLogout();
+    logout();
   };
 
   return (

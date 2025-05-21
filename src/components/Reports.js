@@ -32,6 +32,7 @@ import {
   FilterList as FilterListIcon,
   Clear as ClearIcon
 } from '@mui/icons-material';
+import { useTheme, alpha } from '@mui/material/styles';
 import { useNavigate } from 'react-router-dom';
 import ReportPreview from './reports/ReportPreview';
 import ReportEdit from './reports/ReportEdit';
@@ -92,6 +93,49 @@ const mockReports = [
 
 function Reports() {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const enhancedStyles = {
+    container: {
+      py: 4,
+      backgroundColor: alpha(theme.palette.background.default, 0.8),
+      minHeight: 'calc(100vh - 64px)', // Adjust for navbar height
+    },
+    paperSection: {
+      p: 3,
+      borderRadius: theme.shape.borderRadius,
+      background: 'rgba(255, 255, 255, 0.9)',
+      backdropFilter: 'blur(10px)',
+      border: '1px solid rgba(255, 255, 255, 0.1)',
+      mb: 3, // Add margin bottom to the paper sections
+    },
+    tableContainer: {
+      borderRadius: theme.shape.borderRadius,
+      overflow: 'hidden',
+      boxShadow: `0 4px 20px ${alpha(theme.palette.primary.main, 0.1)}`,
+    },
+    tableHeader: {
+      backgroundColor: alpha(theme.palette.primary.main, 0.05),
+      '& .MuiTableCell-head': {
+        fontWeight: 'bold',
+        color: theme.palette.primary.main,
+      },
+    },
+    tableRow: {
+      '&:hover': {
+        backgroundColor: alpha(theme.palette.primary.main, 0.02),
+      },
+    },
+    actionButton: {
+      transition: 'all 0.2s ease',
+      '&:hover': {
+        transform: 'scale(1.05)',
+      },
+    },
+    filterButton: {
+      textTransform: 'none',
+    }
+  };
+
   const [selectedType, setSelectedType] = useState('');
   const [selectedDepartment, setSelectedDepartment] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -203,13 +247,14 @@ function Reports() {
   };
 
   return (
-    <Box sx={{ p: 3 }}>
-      <Paper sx={{ p: 3 }}>
+    <Box sx={enhancedStyles.container}>
+      {/* Report Actions and Filters */}
+      <Paper sx={enhancedStyles.paperSection}>
         <Grid container spacing={2} alignItems="center" sx={{ mb: 3 }}>
           <Grid item xs={12} md={6}>
             <Typography variant="h5">
               Reports Dashboard
-            </Typography>
+        </Typography>
           </Grid>
           <Grid item xs={12} md={6} sx={{ textAlign: 'right' }}>
             <Button
@@ -231,6 +276,7 @@ function Reports() {
               variant="outlined"
               startIcon={showFilters ? <ClearIcon /> : <FilterListIcon />}
               onClick={() => setShowFilters(!showFilters)}
+              sx={enhancedStyles.filterButton}
             >
               {showFilters ? 'Hide Filters' : 'Show Filters'}
             </Button>
@@ -238,8 +284,8 @@ function Reports() {
         </Grid>
 
         {showFilters && (
-          <Grid container spacing={3} sx={{ mb: 3 }}>
-            <Grid item xs={12} md={4}>
+          <Grid container spacing={3}>
+        <Grid item xs={12} md={4}>
               <TextField
                 select
                 fullWidth
@@ -254,9 +300,9 @@ function Reports() {
                   </MenuItem>
                 ))}
               </TextField>
-            </Grid>
+        </Grid>
 
-            <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={4}>
               <TextField
                 select
                 fullWidth
@@ -271,9 +317,9 @@ function Reports() {
                   </MenuItem>
                 ))}
               </TextField>
-            </Grid>
+        </Grid>
 
-            <Grid item xs={12} md={4}>
+        <Grid item xs={12} md={4}>
               <FormControl fullWidth>
                 <InputLabel>Status</InputLabel>
                 <Select
@@ -353,8 +399,8 @@ function Reports() {
               >
                 Clear All Filters
               </Button>
-            </Grid>
-          </Grid>
+        </Grid>
+      </Grid>
         )}
 
         {error && (
@@ -363,74 +409,81 @@ function Reports() {
           </Alert>
         )}
 
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Report Name</TableCell>
-                <TableCell>Type</TableCell>
-                <TableCell>Department</TableCell>
-                <TableCell>Date</TableCell>
-                <TableCell>Size</TableCell>
-                <TableCell>Format</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredReports.map((report) => (
-                <TableRow key={report.id}>
-                  <TableCell>{report.name}</TableCell>
-                  <TableCell>
-                    <Chip label={report.type} size="small" />
-                  </TableCell>
-                  <TableCell>{report.department}</TableCell>
-                  <TableCell>{report.date}</TableCell>
-                  <TableCell>{report.size}</TableCell>
-                  <TableCell>{report.format}</TableCell>
-                  <TableCell>
-                    <Chip 
-                      label={report.status} 
-                      size="small" 
-                      color={getStatusColor(report.status)}
-                    />
-                  </TableCell>
-                  <TableCell align="right">
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleView(report)}
-                      title="View Report"
-                    >
-                      <VisibilityIcon />
-                    </IconButton>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleDownload(report)}
-                      title="Download Report"
-                    >
-                      <DownloadIcon />
-                    </IconButton>
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleEdit(report)}
-                      title="Edit Report"
-                    >
-                      <EditIcon />
-                    </IconButton>
-                  </TableCell>
+        {/* Filtered Reports Table */}
+        <Box sx={{ mt: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Filtered Reports ({filteredReports.length})
+          </Typography>
+          <TableContainer component={Paper} sx={enhancedStyles.tableContainer}>
+            <Table>
+              <TableHead sx={enhancedStyles.tableHeader}>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell>Department</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Format</TableCell>
+                  <TableCell align="right">Actions</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {filteredReports.map((report) => (
+                  <TableRow key={report.id} sx={enhancedStyles.tableRow}>
+                    <TableCell>{report.name}</TableCell>
+                    <TableCell>
+                      <Chip label={report.type} size="small" />
+                    </TableCell>
+                    <TableCell>{report.department}</TableCell>
+                    <TableCell>{report.date}</TableCell>
+                    <TableCell>
+                      <Chip 
+                        label={report.status} 
+                        size="small" 
+                        color={getStatusColor(report.status)}
+                      />
+                    </TableCell>
+                    <TableCell>{report.format}</TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleView(report)}
+                        title="View Report"
+                        sx={enhancedStyles.actionButton}
+                      >
+                        <VisibilityIcon />
+                      </IconButton>
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleDownload(report)}
+                        title="Download Report"
+                        sx={enhancedStyles.actionButton}
+                      >
+                        <DownloadIcon />
+                      </IconButton>
+                      <IconButton
+                        color="primary"
+                        onClick={() => handleEdit(report)}
+                        title="Edit Report"
+                        sx={enhancedStyles.actionButton}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-        {filteredReports.length === 0 && (
-          <Box sx={{ textAlign: 'center', py: 3 }}>
-            <Typography color="text.secondary">
-              No reports found matching your criteria
-            </Typography>
-          </Box>
-        )}
+          {filteredReports.length === 0 && (
+            <Box sx={{ textAlign: 'center', py: 4 }}>
+              <Typography variant="h6" color="text.secondary">
+                No reports found matching your criteria
+              </Typography>
+            </Box>
+          )}
+        </Box>
       </Paper>
 
       {selectedReport && (
@@ -456,8 +509,8 @@ function Reports() {
         autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
-        <Alert 
-          onClose={() => setSnackbar({ ...snackbar, open: false })} 
+        <Alert
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.severity}
           sx={{ width: '100%' }}
         >
