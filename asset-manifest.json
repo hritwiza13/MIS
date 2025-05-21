@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/MIS/static/css/main.f9718d37.css",
-    "main.js": "/MIS/static/js/main.f48ed168.js",
+    "main.js": "/MIS/static/js/main.3a8f1884.js",
     "index.html": "/MIS/index.html",
     "main.f9718d37.css.map": "/MIS/static/css/main.f9718d37.css.map",
-    "main.f48ed168.js.map": "/MIS/static/js/main.f48ed168.js.map"
+    "main.3a8f1884.js.map": "/MIS/static/js/main.3a8f1884.js.map"
   },
   "entrypoints": [
     "static/css/main.f9718d37.css",
-    "static/js/main.f48ed168.js"
+    "static/js/main.3a8f1884.js"
   ]
 }
