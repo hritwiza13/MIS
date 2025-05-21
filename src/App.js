@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Routes, Route, Navigate, HashRouter as Router, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate, BrowserRouter as Router, useNavigate } from 'react-router-dom';
 import { Box, Container } from '@mui/material';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
@@ -130,7 +130,7 @@ function AppContent() {
 
 function App() {
   return (
-    <Router>
+    <Router basename="/MIS">
       <AuthProvider>
         <AppContent />
       </AuthProvider>
