@@ -74,8 +74,8 @@ function AppContent() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<Welcome />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="/" element={isAuthenticated ? <Navigate to={`/${userInfo?.department}`} replace /> : <Welcome />} />
+      <Route path="/login" element={isAuthenticated ? <Navigate to={`/${userInfo?.department}`} replace /> : <Login />} />
 
       {/* Protected Routes */}
       <Route

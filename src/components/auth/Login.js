@@ -96,8 +96,18 @@ function Login() {
 
       await login(userData);
       console.log('Login handleSubmit: Login successful.');
-      // Navigate directly after successful login
-      navigate(`/${userData.department}`, { replace: true });
+      
+      // Clear form data
+      setFormData({
+        employeeName: '',
+        employeeId: '',
+        password: '',
+        department: ''
+      });
+      
+      // Navigate to the appropriate dashboard
+      const redirectPath = userData.department === 'admin' ? '/admin' : `/${userData.department}`;
+      navigate(redirectPath, { replace: true });
     } catch (err) {
       console.error('Login handleSubmit: Login failed:', err);
       setError(err.message || 'Login failed. Please try again.');
