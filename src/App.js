@@ -80,11 +80,11 @@ function AppContent() {
       {/* Protected Routes */}
       <Route
         path="/*"
-        element={isAuthenticated && userInfo ? <MainLayout /> : <Navigate to="/" replace />}
+        element={isAuthenticated && userInfo ? <MainLayout /> : <Navigate to="/#/login" replace />}
       >
         {/* Admin Dashboard Route */}
         <Route 
-          path="admin" // Relative path
+          path="admin"
           element={
             <ProtectedRoute allowedDepartments={['admin']}>
               <AdminDashboard />
@@ -113,7 +113,7 @@ function AppContent() {
         <Route path="finishing/metal-finishing" element={<ProtectedRoute allowedDepartments={['coloring', 'admin']}><MetalFinishing /></ProtectedRoute>} />
 
         {/* New Inventory Route */}
-         <Route path="inventory/dispatch" element={<ProtectedRoute allowedDepartments={['packaging', 'admin']}><Dispatch /></ProtectedRoute>} />
+        <Route path="inventory/dispatch" element={<ProtectedRoute allowedDepartments={['packaging', 'admin']}><Dispatch /></ProtectedRoute>} />
 
         {/* Reports Routes */}
         <Route path="reports" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><Reports /></ProtectedRoute>} />
@@ -122,13 +122,13 @@ function AppContent() {
         
         {/* New Report Routes */}
         <Route path="reports/scrap" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><ScrapReports /></ProtectedRoute>} />
-         <Route path="reports/returns" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><ReturnsReports /></ProtectedRoute>} />
+        <Route path="reports/returns" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><ReturnsReports /></ProtectedRoute>} />
 
         {/* Redirect any unknown authenticated route to the appropriate dashboard */}
         <Route path="*" element={ 
             userInfo?.department === 'admin' ? 
-              <Navigate to="/admin" replace /> : 
-              <Navigate to={`/${userInfo?.department}`} replace />
+              <Navigate to="/#/admin" replace /> : 
+              <Navigate to={`/#/${userInfo?.department}`} replace />
           } 
         />
       </Route>

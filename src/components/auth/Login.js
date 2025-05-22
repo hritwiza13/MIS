@@ -46,7 +46,7 @@ function Login() {
   useEffect(() => {
     console.log('Login useEffect: isAuthenticated:', isAuthenticated, 'userInfo:', userInfo);
     if (isAuthenticated && userInfo) {
-      const from = location.state?.from?.pathname || `/${userInfo.department}`;
+      const from = location.state?.from?.pathname || `/#/${userInfo.department}`;
       console.log('Login useEffect: Authenticated, redirecting to:', from);
       navigate(from, { replace: true });
     }
