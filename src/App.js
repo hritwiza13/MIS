@@ -80,7 +80,7 @@ function AppContent() {
       {/* Protected Routes */}
       <Route
         path="/*"
-        element={isAuthenticated && userInfo ? <MainLayout /> : <Navigate to="/#/login" replace />}
+        element={isAuthenticated && userInfo ? <MainLayout /> : <Navigate to="/login" replace />}
       >
         {/* Admin Dashboard Route */}
         <Route 
@@ -127,8 +127,8 @@ function AppContent() {
         {/* Redirect any unknown authenticated route to the appropriate dashboard */}
         <Route path="*" element={ 
             userInfo?.department === 'admin' ? 
-              <Navigate to="/#/admin" replace /> : 
-              <Navigate to={`/#/${userInfo?.department}`} replace />
+              <Navigate to="/admin" replace /> : 
+              <Navigate to={`/${userInfo?.department}`} replace />
           } 
         />
       </Route>

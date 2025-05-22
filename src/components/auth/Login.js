@@ -46,7 +46,7 @@ function Login() {
   useEffect(() => {
     console.log('Login useEffect: isAuthenticated:', isAuthenticated, 'userInfo:', userInfo);
     if (isAuthenticated && userInfo) {
-      const from = location.state?.from?.pathname || `/#/${userInfo.department}`;
+      const from = location.state?.from?.pathname || `/${userInfo.department}`;
       console.log('Login useEffect: Authenticated, redirecting to:', from);
       navigate(from, { replace: true });
     }
@@ -96,7 +96,8 @@ function Login() {
 
       await login(userData);
       console.log('Login handleSubmit: Login successful.');
-      // Navigation will be handled by the useEffect above
+      // Navigate directly after successful login
+      navigate(`/${userData.department}`, { replace: true });
     } catch (err) {
       console.error('Login handleSubmit: Login failed:', err);
       setError(err.message || 'Login failed. Please try again.');
