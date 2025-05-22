@@ -10,6 +10,7 @@ import {
   Alert,
 } from '@mui/material';
 import { useTheme, alpha } from '@mui/material/styles';
+import ContentCutIcon from '@mui/icons-material/ContentCut';
 
 function FinishCut() {
   const [buttEndQuantity, setButtEndQuantity] = useState('');
@@ -68,9 +69,12 @@ function FinishCut() {
 
   return (
     <Container maxWidth="lg" sx={enhancedStyles.container}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Finish Cut Management
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <ContentCutIcon sx={{ mr: 1 }} color="primary" />
+        <Typography variant="h4" component="h1">
+          Finish Cut Management
+        </Typography>
+      </Box>
       
       <Paper sx={enhancedStyles.paperSection}>
         <Typography variant="h6" gutterBottom>

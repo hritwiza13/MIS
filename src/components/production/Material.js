@@ -9,6 +9,7 @@ import {
   Button
 } from '@mui/material';
 import { useTheme, alpha } from '@mui/material/styles';
+import LayersIcon from '@mui/icons-material/Layers';
 
 function Material() {
   const theme = useTheme();
@@ -30,9 +31,12 @@ function Material() {
 
   return (
     <Container maxWidth="lg" sx={enhancedStyles.container}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Material Management
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <LayersIcon sx={{ mr: 1 }} color="primary" />
+        <Typography variant="h4" component="h1">
+          Material Management
+        </Typography>
+      </Box>
       
       <Paper sx={enhancedStyles.paperSection}>
         <Typography variant="h6" gutterBottom>

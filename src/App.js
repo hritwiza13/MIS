@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { Routes, Route, Navigate, BrowserRouter as Router, useNavigate } from 'react-router-dom';
-import { Box, Container } from '@mui/material';
+import React from 'react';
+import { Routes, Route, Navigate, HashRouter as Router, Outlet } from 'react-router-dom';
+import { Box, Container, Fade } from '@mui/material';
 import Navbar from './components/layout/Navbar';
 import Sidebar from './components/layout/Sidebar';
 import Login from './components/auth/Login';
@@ -30,111 +30,124 @@ import Dispatch from './components/inventory/Dispatch';
 import ScrapReports from './components/reports/ScrapReports';
 import ReturnsReports from './components/reports/ReturnsReports';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from '@mui/material/styles';
+import theme from './theme'; // Import the custom theme
 
-// Create a wrapper component to use useNavigate
+// Layout component for authenticated routes
+function MainLayout() {
+  const { userInfo } = useAuth();
+  console.log('MainLayout: Rendering for user department:', userInfo?.department);
+  return (
+    <Box sx={{ display: 'flex' }}>
+      <Navbar />
+      <Sidebar department={userInfo?.department} />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          height: '100vh',
+          overflow: 'auto',
+          pt: 8,
+          px: 3
+        }}
+      >
+        <Fade in={true} timeout={500}>
+          <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Outlet />
+          </Container>
+        </Fade>
+      </Box>
+    </Box>
+  );
+}
+
 function AppContent() {
-  const { isAuthenticated, userInfo, logout } = useAuth();
-  const navigate = useNavigate();
+  const { isAuthenticated, userInfo, isLoading } = useAuth();
+  console.log('AppContent: isAuthenticated:', isAuthenticated, 'userInfo:', userInfo, 'isLoading:', isLoading);
+
+  // If loading, don't render anything yet
+  if (isLoading) {
+    console.log('AppContent: Loading authentication state...');
+    return null; // Or a loading spinner/component
+  }
 
   return (
     <Routes>
-      {/* Welcome page route */}
+      {/* Public Routes */}
       <Route path="/" element={<Welcome />} />
-      
-      {/* Route for the Login page */}
       <Route path="/login" element={<Login />} />
 
-      {/* Protected routes - only accessible when authenticated */}
+      {/* Protected Routes */}
       <Route
         path="/*"
-        element={
-          isAuthenticated && userInfo ? (
-            <Box sx={{ display: 'flex' }}>
-              <Navbar />
-              <Sidebar department={userInfo.department} />
-              <Box
-                component="main"
-                sx={{
-                  flexGrow: 1,
-                  height: '100vh',
-                  overflow: 'auto',
-                  pt: 8,
-                  px: 3
-                }}
-              >
-                <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                  <Routes>
-                    {/* Admin Dashboard Route */}
-                    <Route 
-                      path="/admin" 
-                      element={
-                        <ProtectedRoute allowedDepartments={['admin']}>
-                          <AdminDashboard />
-                        </ProtectedRoute>
-                      } 
-                    />
-                    {/* Department Routes */}
-                    <Route path="/production" element={<ProtectedRoute department={userInfo.department} allowedDepartments={['production']}><Production userInfo={userInfo} /></ProtectedRoute>} />
-                    <Route path="/quality" element={<ProtectedRoute department={userInfo.department} allowedDepartments={['quality']}><Quality userInfo={userInfo} /></ProtectedRoute>} />
-                    <Route path="/maintenance" element={<ProtectedRoute department={userInfo.department} allowedDepartments={['maintenance']}><Maintenance userInfo={userInfo} /></ProtectedRoute>} />
-                    <Route path="/packaging" element={<ProtectedRoute department={userInfo.department} allowedDepartments={['packaging']}><Packaging userInfo={userInfo} /></ProtectedRoute>} />
-                    <Route path="/coloring" element={<ProtectedRoute department={userInfo.department} allowedDepartments={['coloring']}><Coloring userInfo={userInfo} /></ProtectedRoute>} />
-                    
-                    {/* New Production Process Routes */}
-                    <Route path="/production/raw-material" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><RawMaterial /></ProtectedRoute>} />
-                    <Route path="/production/billets" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><Billets /></ProtectedRoute>} />
-                    <Route path="/production/direct" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><Direct /></ProtectedRoute>} />
-                    <Route path="/production/butt-end" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><ButtEnd /></ProtectedRoute>} />
-                    <Route path="/production/material" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><Material /></ProtectedRoute>} />
-                    <Route path="/production/finish-cut" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><FinishCut /></ProtectedRoute>} />
-                    <Route path="/production/wip" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><WIP /></ProtectedRoute>} />
+        element={isAuthenticated && userInfo ? <MainLayout /> : <Navigate to="/" replace />}
+      >
+        {/* Admin Dashboard Route */}
+        <Route 
+          path="admin" // Relative path
+          element={
+            <ProtectedRoute allowedDepartments={['admin']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } 
+        />
+        {/* Department Routes */}
+        <Route path="production" element={<ProtectedRoute allowedDepartments={['production']}><Production userInfo={userInfo} /></ProtectedRoute>} />
+        <Route path="quality" element={<ProtectedRoute allowedDepartments={['quality']}><Quality userInfo={userInfo} /></ProtectedRoute>} />
+        <Route path="maintenance" element={<ProtectedRoute allowedDepartments={['maintenance']}><Maintenance userInfo={userInfo} /></ProtectedRoute>} />
+        <Route path="packaging" element={<ProtectedRoute allowedDepartments={['packaging']}><Packaging userInfo={userInfo} /></ProtectedRoute>} />
+        <Route path="coloring" element={<ProtectedRoute allowedDepartments={['coloring']}><Coloring userInfo={userInfo} /></ProtectedRoute>} />
+        
+        {/* New Production Process Routes */}
+        <Route path="production/raw-material" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><RawMaterial /></ProtectedRoute>} />
+        <Route path="production/billets" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><Billets /></ProtectedRoute>} />
+        <Route path="production/direct" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><Direct /></ProtectedRoute>} />
+        <Route path="production/butt-end" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><ButtEnd /></ProtectedRoute>} />
+        <Route path="production/material" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><Material /></ProtectedRoute>} />
+        <Route path="production/finish-cut" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><FinishCut /></ProtectedRoute>} />
+        <Route path="production/wip" element={<ProtectedRoute allowedDepartments={['production', 'admin']}><WIP /></ProtectedRoute>} />
 
-                    {/* New Finishing Routes */}
-                    <Route path="/finishing/power-coating" element={<ProtectedRoute allowedDepartments={['coloring', 'admin']}><PowerCoating /></ProtectedRoute>} />
-                    <Route path="/finishing/anodizing" element={<ProtectedRoute allowedDepartments={['coloring', 'admin']}><Anodizing /></ProtectedRoute>} />
-                    <Route path="/finishing/metal-finishing" element={<ProtectedRoute allowedDepartments={['coloring', 'admin']}><MetalFinishing /></ProtectedRoute>} />
+        {/* New Finishing Routes */}
+        <Route path="finishing/power-coating" element={<ProtectedRoute allowedDepartments={['coloring', 'admin']}><PowerCoating /></ProtectedRoute>} />
+        <Route path="finishing/anodizing" element={<ProtectedRoute allowedDepartments={['coloring', 'admin']}><Anodizing /></ProtectedRoute>} />
+        <Route path="finishing/metal-finishing" element={<ProtectedRoute allowedDepartments={['coloring', 'admin']}><MetalFinishing /></ProtectedRoute>} />
 
-                    {/* New Inventory Route */}
-                     <Route path="/inventory/dispatch" element={<ProtectedRoute allowedDepartments={['packaging', 'admin']}><Dispatch /></ProtectedRoute>} />
+        {/* New Inventory Route */}
+         <Route path="inventory/dispatch" element={<ProtectedRoute allowedDepartments={['packaging', 'admin']}><Dispatch /></ProtectedRoute>} />
 
-                    {/* Reports Routes */}
-                    <Route path="/reports" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><Reports /></ProtectedRoute>} />
-                    <Route path="/reports/upload" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><ReportUpload /></ProtectedRoute>} />
-                    <Route path="/reports/download" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><ReportDownload /></ProtectedRoute>} />
-                    
-                    {/* New Report Routes */}
-                    <Route path="/reports/scrap" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><ScrapReports /></ProtectedRoute>} />
-                     <Route path="/reports/returns" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><ReturnsReports /></ProtectedRoute>} />
+        {/* Reports Routes */}
+        <Route path="reports" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><Reports /></ProtectedRoute>} />
+        <Route path="reports/upload" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><ReportUpload /></ProtectedRoute>} />
+        <Route path="reports/download" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><ReportDownload /></ProtectedRoute>} />
+        
+        {/* New Report Routes */}
+        <Route path="reports/scrap" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><ScrapReports /></ProtectedRoute>} />
+         <Route path="reports/returns" element={<ProtectedRoute allowedDepartments={['production', 'quality', 'maintenance', 'packaging', 'coloring', 'admin']}><ReturnsReports /></ProtectedRoute>} />
 
-                    {/* Redirect any unknown authenticated route to the appropriate dashboard */}
-                    <Route path="*" element={
-                      userInfo.department === 'admin' ? 
-                        <Navigate to="/admin" /> : 
-                        <Navigate to={`/${userInfo.department}`} />
-                    } />
-                  </Routes>
-                </Container>
-              </Box>
-            </Box>
-          ) : (
-            <Navigate to="/login" />
-          )
-        }
-      />
+        {/* Redirect any unknown authenticated route to the appropriate dashboard */}
+        <Route path="*" element={ 
+            userInfo?.department === 'admin' ? 
+              <Navigate to="/admin" replace /> : 
+              <Navigate to={`/${userInfo?.department}`} replace />
+          } 
+        />
+      </Route>
 
-      {/* Fallback route for any path that doesn't match */}      
-      <Route path="*" element={<Navigate to="/" />} />
+      {/* Fallback route for any path that doesn't match public or protected */}      
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
 
 function App() {
   return (
-    <Router basename="/MIS">
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </Router>
+    <AuthProvider>
+      <ThemeProvider theme={theme}>
+        <Router>
+          <AppContent />
+        </Router>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
 

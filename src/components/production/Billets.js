@@ -10,6 +10,7 @@ import {
   Alert,
 } from '@mui/material';
 import { useTheme, alpha } from '@mui/material/styles';
+import StraightenIcon from '@mui/icons-material/Straighten';
 
 function Billets() {
   const [logQuantity, setLogQuantity] = useState('');
@@ -64,9 +65,12 @@ function Billets() {
 
   return (
     <Container maxWidth="lg" sx={enhancedStyles.container}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Billets Management
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <StraightenIcon sx={{ mr: 1 }} color="primary" />
+        <Typography variant="h4" component="h1">
+          Billets Management
+        </Typography>
+      </Box>
       
       <Paper sx={enhancedStyles.paperSection}>
         <Typography variant="h6" gutterBottom>
@@ -89,6 +93,14 @@ function Billets() {
               type="number"
               value={billetQuantity}
               onChange={(e) => setBilletQuantity(e.target.value)}
+            />
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              fullWidth
+              label="Scrap Quantity (Auto-calculated)"
+              type="number"
+              value={scrapQuantity}
             />
           </Grid>
           

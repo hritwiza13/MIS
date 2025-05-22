@@ -2,11 +2,11 @@
   "name": "hindalco-steel-mis",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://hritwiza13.github.io/MIS/",
+  "homepage": "https://hritwiza13.github.io/MIS",
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-    "@mui/icons-material": "^5.15.0",
+    "@mui/icons-material": "^5.17.1",
     "@mui/material": "^5.15.0",
     "@mui/x-date-pickers": "^8.3.1",
     "axios": "^1.6.0",

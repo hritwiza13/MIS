@@ -9,6 +9,7 @@ import {
   Button
 } from '@mui/material';
 import { useTheme, alpha } from '@mui/material/styles';
+import StorageIcon from '@mui/icons-material/Storage';
 
 function RawMaterial() {
   const theme = useTheme();
@@ -30,9 +31,12 @@ function RawMaterial() {
 
   return (
     <Container maxWidth="lg" sx={enhancedStyles.container}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Raw Material Management
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <StorageIcon sx={{ mr: 1 }} color="primary" />
+        <Typography variant="h4" component="h1">
+          Raw Material Management
+        </Typography>
+      </Box>
       
       <Paper sx={enhancedStyles.paperSection}>
         <Typography variant="h6" gutterBottom>

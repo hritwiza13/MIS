@@ -23,43 +23,12 @@ import {
   Engineering as EngineeringIcon,
   LocalShipping as ShippingIcon
 } from '@mui/icons-material';
-import Login from './auth/Login';
-import Dialog from '@mui/material/Dialog';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
-import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
 import { useAuth } from '../contexts/AuthContext';
 
 function Welcome() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [openLoginDialog, setOpenLoginDialog] = useState(false);
-  const { login } = useAuth(); // Use the login function from AuthContext
-
-  const handleOpenLogin = () => {
-    setOpenLoginDialog(true);
-  };
-
-  const handleCloseLogin = () => {
-    setOpenLoginDialog(false);
-  };
-
-  const handleLogin = (data) => {
-    console.log('Simulating login with data:', data);
-    handleCloseLogin(); // Close the dialog first
-    login(data); // Call the login function from AuthContext
-
-    // Navigation is now handled by the login function in AuthContext,
-    // which will trigger App.js to render protected routes.
-    // Remove local navigation:
-    // if (data.department === 'admin') {
-    //   navigate('/admin');
-    // } else {
-    //   navigate(`/${data.department}`);
-    // }
-  };
 
   const features = [
     {
@@ -179,7 +148,7 @@ function Welcome() {
           <Button
             variant="outlined"
             color="primary"
-            onClick={handleOpenLogin}
+            onClick={() => navigate('/login')}
             sx={{
               px: 4,
               py: 1,
@@ -232,25 +201,6 @@ function Welcome() {
                 >
                   Transform your aluminum manufacturing operations with our cutting-edge Management Information System. Experience unprecedented efficiency and control.
                 </Typography>
-                <Button
-                  variant="contained"
-                  onClick={handleOpenLogin}
-                  sx={{
-                    px: 6,
-                    py: 1.5,
-                    borderRadius: 2,
-                    textTransform: 'none',
-                    fontSize: '1.2rem',
-                    background: 'linear-gradient(45deg, #64ffda 30%, #1976d2 90%)',
-                    color: '#0a192f',
-                    fontWeight: 'bold',
-                    '&:hover': {
-                      background: 'linear-gradient(45deg, #1976d2 30%, #64ffda 90%)'
-                    }
-                  }}
-                >
-                  Get Started
-                </Button>
               </Box>
             </Slide>
           </Grid>
@@ -359,28 +309,6 @@ function Welcome() {
           </Typography>
         </Box>
       </Fade>
-
-      {/* Login Dialog */}
-      <Dialog open={openLoginDialog} onClose={handleCloseLogin}>
-        <DialogTitle>
-          Login
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseLogin}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent>
-          <Login />
-        </DialogContent>
-      </Dialog>
     </Box>
   );
 }

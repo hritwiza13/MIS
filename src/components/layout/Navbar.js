@@ -42,12 +42,27 @@ function Navbar() {
         </Typography>
         
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="body1" sx={{ mr: 2 }}>
-            {userInfo.user.name} ({userInfo.user.id})
-          </Typography>
-          <Typography variant="body2" sx={{ mr: 2 }}>
-            {userInfo.department.charAt(0).toUpperCase() + userInfo.department.slice(1)}
-          </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+            <Typography 
+              variant="subtitle1" 
+              sx={{ 
+                fontWeight: 'bold',
+                color: 'white',
+                fontSize: '1.1rem'
+              }}
+            >
+              {userInfo?.user?.name || 'User'}
+            </Typography>
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontSize: '0.8rem'
+              }}
+            >
+              ID: {userInfo?.user?.id} | {userInfo?.department ? userInfo.department.charAt(0).toUpperCase() + userInfo.department.slice(1) : ''}
+            </Typography>
+          </Box>
           
           <IconButton color="inherit">
             <NotificationsIcon />
@@ -57,13 +72,21 @@ function Navbar() {
             <SettingsIcon />
           </IconButton>
           
-          <Tooltip title="Account settings">
+          <Tooltip title={`${userInfo?.user?.name || 'User'} - ${userInfo?.department || ''}`}>
             <IconButton
               onClick={handleMenu}
               color="inherit"
             >
-              <Avatar sx={{ width: 32, height: 32 }}>
-                {userInfo.user.name.charAt(0)}
+              <Avatar 
+                sx={{ 
+                  width: 32, 
+                  height: 32,
+                  bgcolor: 'primary.light',
+                  fontSize: '1rem',
+                  fontWeight: 'bold'
+                }}
+              >
+                {(userInfo?.user?.name || userInfo?.user?.id || '?').charAt(0).toUpperCase()}
               </Avatar>
             </IconButton>
           </Tooltip>

@@ -10,6 +10,7 @@ import {
   Alert,
 } from '@mui/material';
 import { useTheme, alpha } from '@mui/material/styles';
+import SquareFootIcon from '@mui/icons-material/SquareFoot';
 
 function Direct() {
   const [inputQuantity, setInputQuantity] = useState('');
@@ -68,9 +69,12 @@ function Direct() {
 
   return (
     <Container maxWidth="lg" sx={enhancedStyles.container}>
-      <Typography variant="h4" component="h1" gutterBottom>
-        Direct Processing Management
-      </Typography>
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <SquareFootIcon sx={{ mr: 1 }} color="primary" />
+        <Typography variant="h4" component="h1">
+          Direct Processing Management
+        </Typography>
+      </Box>
       
       <Paper sx={enhancedStyles.paperSection}>
         <Typography variant="h6" gutterBottom>
